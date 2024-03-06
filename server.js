@@ -1,27 +1,18 @@
-const app = express();
+const express = require("express");
 const cors = require("cors");
 
+const app = express();
 
-const allowedOrigins= ['http://localhost:4200/', '*'];
-var corsOptionsDelegate = (req, callback) => {
-var corsOptions;
-  
-console.log(req.header('Origin'));
-if(allowedOrigins.indexOf(req.header('Origin')) !== -1) {
-corsOptions = { origin: true };
-}
-else {
-corsOptions = { origin: false };
-}
-callback(null, corsOptions);
+var corsOptions = {
+  origin: "*"
 };
 
-
-
-
-
 app.use(cors(corsOptions));
+
+// parse requests of content-type - application/json
 app.use(express.json());
+
+// parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
 const db = require("./app/models");
@@ -38,14 +29,15 @@ db.mongoose
     process.exit();
   });
 
+// simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
+  res.json({ message: "Welcome to application." });
 });
 
 require("./app/routes/turorial.routes")(app);
 
-exports.cors = cors();
-exports.corsWithOptions = cors(corsOptionsDelegate);
-
-module.exports = app; // exporting app for vercel
-
+// set port, listen for requests
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
+});
